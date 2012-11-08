@@ -1,0 +1,23 @@
+*~
+*.backup
+*.swp
+*.pyc
+*.pyo
+refs
+*.faces
+*.vertices
+*.html
+
+#tetgen products
+*.ele
+*.face
+*.node
+
+#bin
+bin/mesh-viewerc
+
+test/.coverage
+build/
+dist/
+MANIFEST
+.spyderproject
