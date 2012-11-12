@@ -1,0 +1,23 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+"""
+Created on Sun Nov 11 21:34:42 2012
+
+@author: r_milk01
+"""
+
+import sys
+import argparse
+
+from gitnotifs import notify_rows
+
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--config", help="config file")
+    args = parser.parse_args()
+    if args.config:
+        print "verbosity turned on"
+    config = '/tmp/cfg'
+    # old, new, ref tuples
+    rows = [line.strip().split(' ') for line in sys.stdin.xreadlines()]
+    notify_rows(rows, config)
