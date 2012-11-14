@@ -8,16 +8,18 @@ Created on Sun Nov 11 21:34:42 2012
 
 import sys
 import argparse
+import logging
 
-from gitnotifs import notify_rows
+from gitnotifs import notify
 
 if __name__ == '__main__':
+    logging.basicConfig(level=logging.DEBUG)
     parser = argparse.ArgumentParser()
     parser.add_argument("--config", help="config file")
     args = parser.parse_args()
     if args.config:
         print "verbosity turned on"
-    config = '/tmp/cfg'
     # old, new, ref tuples
-    rows = [line.strip().split(' ') for line in sys.stdin.xreadlines()]
-    notify_rows(rows, config)
+    #r,a,b =  sys.stdin.readlines()
+    r,a,b = 'f362ab4455481eaecb402a7d04def38c75a059e5', 'dddb9f2fbbbf2c132f706447d266000ddc8a91f5', 'refs/heads/master'
+    notify(r, a, b, args.config)
