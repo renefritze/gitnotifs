@@ -21,5 +21,5 @@ if __name__ == '__main__':
         print "verbosity turned on"
     # old, new, ref tuples
     #r,a,b =  sys.stdin.readlines()
-    r,a,b = 'f362ab4455481eaecb402a7d04def38c75a059e5', 'dddb9f2fbbbf2c132f706447d266000ddc8a91f5', 'refs/heads/master'
+    r,a,b = 'c0a9192585dc04dffcaf309aa6e587f7a3a9d336', '4ccebc75e4abc6174ce7379471355431524c1c91', 'refs/heads/master'
     notify(r, a, b, args.config)

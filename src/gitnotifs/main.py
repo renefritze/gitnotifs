@@ -29,7 +29,7 @@ class FileDiff(object):
             self.filename = d.a_blob.path
         elif d.renamed:
             self.cat = 'renamed'
-            self.filename = '%s --> %s' % (d.a_blob.path, d.b_blob.path)
+            self.filename = '%s --> %s' % (d.rename_from, d.rename_to)
         else:
             self.cat = 'changed'
             self.filename =  d.a_blob.path
@@ -45,9 +45,9 @@ def _get_diffs(old_rev, new_rev, rev_name, cfg):
             for k in d:
                 for j in k:
                     yield j    
-    return [FileDiff(d) for d in _diffs()] 
+    return [FileDiff(d) for d in _diffs()], commits
         
-def format_message(module, diffs, old_rev, new_rev, rev_name, cfg):
+def format_message(module, diffs, commits, old_rev, new_rev, rev_name, cfg):
     try:
         header_tpl = jinja2.Template(cfg['%s.header'%module])
         body_tpl = jinja2.Template(cfg['%s.body'%module])
@@ -55,20 +55,17 @@ def format_message(module, diffs, old_rev, new_rev, rev_name, cfg):
         header_tpl = jinja2.Template(cfg['general.header'])
         body_tpl = jinja2.Template(cfg['general.body'])
     date = datetime.now()
-    
     return header_tpl.render(locals()), body_tpl.render(locals())
 
 def notify(old_rev, new_rev, rev_name, config_file):
     cfg = Config()
     cfg.read([config_file, os.path.expanduser('~/.gitnotifs')])
-    diffs = _get_diffs(old_rev, new_rev, rev_name, cfg)
+    diffs, commits = _get_diffs(old_rev, new_rev, rev_name, cfg)
     for transport in cfg['general.active'].split():
         pname = 'gitnotifs.%s' % transport
         __import__(pname)
         module  = sys.modules[pname]
-        header, body = format_message(transport, diffs, old_rev, new_rev, rev_name, cfg)
-        print header
-        print body 
+        header, body = format_message(transport, diffs, commits, old_rev, new_rev, rev_name, cfg)
         module.notify(header, body, cfg)
         
 #read oldrev newrev refname
