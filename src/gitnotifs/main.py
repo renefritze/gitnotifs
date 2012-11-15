@@ -10,6 +10,7 @@ from datetime import datetime
 import sys
 import git
 import os
+import logging
 from git import DiffIndex
 
 class Config(ConfigParser):
@@ -50,10 +51,15 @@ def _get_diffs(old_rev, new_rev, rev_name, cfg):
 def format_message(module, diffs, commits, old_rev, new_rev, rev_name, cfg):
     try:
         header_tpl = jinja2.Template(cfg['%s.header'%module])
-        body_tpl = jinja2.Template(cfg['%s.body'%module])
     except NoOptionError as e:
+        logging.error('falling back to general header')
         header_tpl = jinja2.Template(cfg['general.header'])
+    try:
+        body_tpl = jinja2.Template(cfg['%s.body'%module])
+    except NoOptionError as f:
+        logging.error('falling back to general body')
         body_tpl = jinja2.Template(cfg['general.body'])
+        
     date = datetime.now()
     return header_tpl.render(locals()), body_tpl.render(locals())
 

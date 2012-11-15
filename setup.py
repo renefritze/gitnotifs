@@ -18,7 +18,7 @@ setup(
     # running `setup.py sdist' gives a warning about this, but still
     # install_requires is the only thing that works with pip/easy_install...
     # we do not list pyqt here since pip can't seem to install it
-    install_requires = ['xmpppy', 'GitPython', 'jinja2'] + tests_require,
+    install_requires = ['xmpppy', 'GitPython', 'irc', 'webhelpers', 'jinja2'] + tests_require,
     classifiers = ['Development Status :: 4 - Beta',
 	'Intended Audience :: System Administrators',
 	'Topic :: Software Development :: Version Control'],
