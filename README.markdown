@@ -19,3 +19,8 @@ Homepage
 
 http://renemilk.github.com/gitnotifs
 
+
+Usage
+--------
+
+pipe stdin to "git-notify -c some.cfg" from a post-receive hook
