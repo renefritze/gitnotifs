@@ -13,13 +13,11 @@ import logging
 from gitnotifs import notify
 
 if __name__ == '__main__':
-    logging.basicConfig(level=logging.DEBUG)
+    logging.basicConfig(level=logging.ERROR)
     parser = argparse.ArgumentParser()
-    parser.add_argument("--config", help="config file")
+    parser.add_argument('-c', '--config', help="config file", default='')
     args = parser.parse_args()
-    if args.config:
-        print "verbosity turned on"
-    # old, new, ref tuples
-    #r,a,b =  sys.stdin.readlines()
-    r,a,b = 'c0a9192585dc04dffcaf309aa6e587f7a3a9d336', '4ccebc75e4abc6174ce7379471355431524c1c91', 'refs/heads/master'
-    notify(r, a, b, args.config)
+    for line in sys.stdin.readlines():
+        # old, new, ref tuples
+        r,a,b = line.split()
+        notify(r, a, b, args.config)

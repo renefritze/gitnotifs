@@ -1,7 +1,7 @@
 import sys
 from distutils.core import setup
 
-tests_require = ['nose-cov', 'nose', 'nosehtmloutput', 'rednose']
+tests_require = []
 
 setup(
     name = 'gitnotifs',
@@ -10,7 +10,7 @@ setup(
     author_email = 'rene.milk@uni-muenster.de',
     package_dir = {'':'src'},
     packages = ['gitnotifs',],
-    scripts = ['bin/%s'%n for n in [] ],
+    scripts = ['bin/%s'%n for n in ['git-notify'] ],
     url = 'http://renemilk.github.com/gitnotifs',
     description = 'notification scripts/module for git repositories',
     long_description = open('README.txt').read(),

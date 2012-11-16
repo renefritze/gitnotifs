@@ -11,6 +11,7 @@ import sys
 import git
 import os
 import logging
+import itertools
 from git import DiffIndex
 
 class Config(ConfigParser):
@@ -39,16 +40,18 @@ class FileDiff(object):
 def _get_diffs(old_rev, new_rev, rev_name, cfg):
     repo = git.Repo(cfg['general.repo_path'])
     commits = list(repo.iter_commits('%s..%s' %(old_rev,new_rev)))
-    change_types = [[d.iter_change_type(t) for t in DiffIndex.change_type] 
+    changes = [[d.iter_change_type(t) for t in DiffIndex.change_type] 
                     for d in [c.parents[0].diff(c, create_patch=True) for c in commits]]
-    def _diffs():
-        for d in change_types:
-            for k in d:
-                for j in k:
-                    yield j    
-    return [FileDiff(d) for d in _diffs()], commits
+    chain_iter = itertools.chain.from_iterable
+    return [FileDiff(d) for d in chain_iter(chain_iter([d for d in changes]))], commits
         
 def format_message(module, diffs, commits, old_rev, new_rev, rev_name, cfg):
+    branch = rev_name.split('/')[-1]
+    project = os.path.basename(cfg['general.repo_path'])
+    counts = dict()
+    for i in ['new', 'deleted', 'renamed', 'changed']:
+        counts[i] = len([f for f in diffs if f.cat == i])
+    statstring = ' | '.join(['%d %s'%(u, h) for h,u in counts.iteritems()])
     try:
         header_tpl = jinja2.Template(cfg['%s.header'%module])
     except NoOptionError as e:
@@ -59,27 +62,18 @@ def format_message(module, diffs, commits, old_rev, new_rev, rev_name, cfg):
     except NoOptionError as f:
         logging.error('falling back to general body')
         body_tpl = jinja2.Template(cfg['general.body'])
-        
     date = datetime.now()
     return header_tpl.render(locals()), body_tpl.render(locals())
 
-def notify(old_rev, new_rev, rev_name, config_file):
+def notify(old_rev, new_rev, rev_name, config_file=None):
     cfg = Config()
-    cfg.read([config_file, os.path.expanduser('~/.gitnotifs')])
+    cfg.read([os.path.expanduser('~/.gitnotifs'), config_file])
     diffs, commits = _get_diffs(old_rev, new_rev, rev_name, cfg)
     for transport in cfg['general.active'].split():
         pname = 'gitnotifs.%s' % transport
+        logging.debug('module: %s' % pname)
         __import__(pname)
         module  = sys.modules[pname]
         header, body = format_message(transport, diffs, commits, old_rev, new_rev, rev_name, cfg)
         module.notify(header, body, cfg)
         
-#read oldrev newrev refname
-#
-#branch=$(echo $refname | sed "s;refs/heads/;branch: ;g")
-#repo=$(echo ${PWD} | sed "s;^\(.*\)/\(.*\)/\(.*\)$;\2/\3;g")
-#echo "notifying of commits"
-##project=${repo%.git}
-#project=${repo}
-#url=http://dune-project.uni-muenster.de/cgit/${project}/commit/?id=${newrev}
-#jabnotif "$(git log --shortstat --pretty=format:"${repo}, $branch%n%cn: %s%n%b" $oldrev..$newrev) ${url}" $(cat notifs) &> /dev/null

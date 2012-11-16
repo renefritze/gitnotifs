@@ -23,6 +23,6 @@ class NotifyBot(irc.bot.SingleServerIRCBot):
         self.die()
 
 def notify(header, body, cfg):
-    bot = NotifyBot('#'+cfg['IRC.channel'], cfg['IRC.nick'], cfg['IRC.server'], int(cfg['IRC.port']), header+body)
+    bot = NotifyBot('#'+cfg['IRC.channel'], cfg['IRC.nick'], cfg['IRC.server'], int(cfg['IRC.port']), header+'\n'+body)
     return bot.start()
     
