@@ -3,9 +3,10 @@ try:
 except:
     import pickle
 
-from webhelpers.feedgenerator import Rss201rev2Feed
+from webhelpers.feedgenerator import Rss201rev2Feed as Feed
 from datetime import datetime
 import logging
+import cgi
 
 class Item(object):
     def __init__(self, t, l, a, d):
@@ -13,7 +14,7 @@ class Item(object):
         self.link = l
         self.author_name = a
         self.pubdate = datetime.now() 
-        self.description = d
+        self.description = d.replace('\n', '<br/>')
     
 def notify(header, body, cfg):
     fn = cfg['rss.file']
@@ -25,7 +26,7 @@ def notify(header, body, cfg):
         logging.error(e)
         previous = []
     previous = previous[:max(10, len(previous))]
-    feed = Rss201rev2Feed(
+    feed = Feed(
             title=cfg['rss.title'],
             link='',
             description=cfg['rss.description'],
