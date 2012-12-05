@@ -12,6 +12,7 @@ import git
 import os
 import logging
 import itertools
+import subprocess
 from git import DiffIndex
 
 class Config(ConfigParser):
@@ -62,6 +63,10 @@ def format_message(module, diffs, commits, old_rev, new_rev, rev_name, cfg):
     except NoOptionError as f:
         body_tpl = jinja2.Template(cfg['general.body'])
     date = datetime.now()
+    shortlog = subprocess.check_output(['git', 'log', '--shortstat', 
+                                        '--pretty=format:{}, {}%n%cn: %s%n%b'.format(project, branch),
+                                        '{}...{}'.format(old_rev, new_rev) ])
+    
     return header_tpl.render(locals()), body_tpl.render(locals())
 
 def notify(old_rev, new_rev, rev_name, config_file=None):
