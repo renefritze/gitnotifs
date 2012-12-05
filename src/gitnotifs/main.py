@@ -43,7 +43,8 @@ def _get_diffs(old_rev, new_rev, rev_name, cfg):
     changes = [[d.iter_change_type(t) for t in DiffIndex.change_type] 
                     for d in [c.parents[0].diff(c, create_patch=True) for c in commits]]
     chain_iter = itertools.chain.from_iterable
-    return [FileDiff(d) for d in chain_iter(chain_iter([d for d in changes]))], commits
+    diffs = [FileDiff(d) for d in chain_iter(chain_iter([d for d in changes]))]
+    return diffs, commits
         
 def format_message(module, diffs, commits, old_rev, new_rev, rev_name, cfg):
     branch = rev_name.split('/')[-1]
@@ -55,23 +56,22 @@ def format_message(module, diffs, commits, old_rev, new_rev, rev_name, cfg):
     try:
         header_tpl = jinja2.Template(cfg['%s.header'%module])
     except NoOptionError as e:
-        logging.error('falling back to general header')
         header_tpl = jinja2.Template(cfg['general.header'])
     try:
         body_tpl = jinja2.Template(cfg['%s.body'%module])
     except NoOptionError as f:
-        logging.error('falling back to general body')
         body_tpl = jinja2.Template(cfg['general.body'])
     date = datetime.now()
     return header_tpl.render(locals()), body_tpl.render(locals())
 
 def notify(old_rev, new_rev, rev_name, config_file=None):
     cfg = Config()
-    cfg.read([os.path.expanduser('~/.gitnotifs'), config_file])
+    used = cfg.read([os.path.expanduser('~/.gitnotifs'), config_file])
+    logging.debug('using %s as config'%used)
     diffs, commits = _get_diffs(old_rev, new_rev, rev_name, cfg)
     for transport in cfg['general.active'].split():
         pname = 'gitnotifs.%s' % transport
-        logging.debug('module: %s' % pname)
+        logging.info('module: %s' % pname)
         __import__(pname)
         module  = sys.modules[pname]
         header, body = format_message(transport, diffs, commits, old_rev, new_rev, rev_name, cfg)

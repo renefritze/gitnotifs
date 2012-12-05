@@ -19,5 +19,5 @@ if __name__ == '__main__':
     args = parser.parse_args()
     for line in sys.stdin.readlines():
         # old, new, ref tuples
-        r,a,b = line.split()
-        notify(r, a, b, args.config)
+        old_rev, new_rev, rev_name = line.split()
+        notify(old_rev, new_rev, rev_name, args.config)
