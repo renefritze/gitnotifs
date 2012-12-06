@@ -54,6 +54,16 @@ def format_message(module, diffs, commits, old_rev, new_rev, rev_name, cfg):
     for i in ['new', 'deleted', 'renamed', 'changed']:
         counts[i] = len([f for f in diffs if f.cat == i])
     statstring = ' | '.join(['%d %s'%(u, h) for h,u in counts.iteritems()])
+    date = datetime.now()
+    shortlog = subprocess.check_output(['git', 'log', '--shortstat', 
+                                        '--pretty=format:{}, {}%n%cn: %s%n%b'.format(project, branch),
+                                        '{}...{}'.format(old_rev, new_rev) ])
+    try:
+        link_tpl = jinja2.Template(cfg['%s.link'%module])
+    except NoOptionError as e:
+        link_tpl = jinja2.Template(cfg['general.link'])
+    link = link_tpl.render(locals())
+    
     try:
         header_tpl = jinja2.Template(cfg['%s.header'%module])
     except NoOptionError as e:
@@ -62,10 +72,6 @@ def format_message(module, diffs, commits, old_rev, new_rev, rev_name, cfg):
         body_tpl = jinja2.Template(cfg['%s.body'%module])
     except NoOptionError as f:
         body_tpl = jinja2.Template(cfg['general.body'])
-    date = datetime.now()
-    shortlog = subprocess.check_output(['git', 'log', '--shortstat', 
-                                        '--pretty=format:{}, {}%n%cn: %s%n%b'.format(project, branch),
-                                        '{}...{}'.format(old_rev, new_rev) ])
     
     return header_tpl.render(locals()), body_tpl.render(locals())
 
