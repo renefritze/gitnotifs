@@ -9,7 +9,7 @@ def notify(header, body, cfg):
     conn = smtp(host=cfg['mail.server'], port=cfg['mail.port'])
     conn.set_debuglevel(1)
     conn.login(cfg['mail.login'], cfg['mail.pw'])
-    recipients = cfg['mail.recipients'].split()
+    recipients = cfg['mail.recipients'].split('\n')
     
     msg = MIMEText(body)
     msg['Subject'] = header
