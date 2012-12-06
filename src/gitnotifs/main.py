@@ -4,7 +4,6 @@ Created on Sun Nov 11 21:46:35 2012
 
 @author: r_milk01
 """
-from ConfigParser import NoOptionError
 import jinja2
 from datetime import datetime
 import sys
@@ -14,7 +13,7 @@ import logging
 import itertools
 import subprocess
 from git import DiffIndex
-
+import config
 
 class FileDiff(object):
     def __init__(self, diff_index):
@@ -57,23 +56,22 @@ def format_message(module, diffs, commits, old_rev, new_rev, rev_name, cfg):
                                         '{}...{}'.format(old_rev, new_rev) ])
     try:
         link_tpl = jinja2.Template(cfg['%s.link'%module])
-    except NoOptionError as e:
+    except config.NoOptionError as e:
         link_tpl = jinja2.Template(cfg['general.link'])
     link = link_tpl.render(locals())
     
     try:
         header_tpl = jinja2.Template(cfg['%s.header'%module])
-    except NoOptionError as e:
+    except config.NoOptionError as e:
         header_tpl = jinja2.Template(cfg['general.header'])
     try:
         body_tpl = jinja2.Template(cfg['%s.body'%module])
-    except NoOptionError as f:
+    except config.NoOptionError as f:
         body_tpl = jinja2.Template(cfg['general.body'])
     
     return header_tpl.render(locals()), body_tpl.render(locals())
 
 def notify(old_rev, new_rev, rev_name, config_file=None):
-    import config
     cfg = config.Config()
     used = cfg.read([os.path.expanduser('~/.gitnotifs'), config_file])
     logging.debug('using %s as config'%used)
