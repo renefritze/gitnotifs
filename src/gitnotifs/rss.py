@@ -16,7 +16,7 @@ class Item(object):
         self.pubdate = datetime.now() 
         self.description = d.replace('\n', '<br/>')
     
-def notify(header, body, cfg):
+def notify(header, body, cfg, link):
     fn = cfg['rss.file']
     pickle_fn = fn + '.pickle'
     try:
@@ -32,7 +32,7 @@ def notify(header, body, cfg):
             description=cfg['rss.description'],
             language=u"en",
         )
-    previous.insert(0, Item(header, '', 'author', body))
+    previous.insert(0, Item(header, link, 'author', body))
     for item in previous:
         feed.add_item(title=item.title, description=item.description, link=item.link, author_name=item.author_name,
                        pubdate=item.pubdate)

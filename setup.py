@@ -5,7 +5,7 @@ tests_require = []
 
 setup(
     name = 'gitnotifs',
-    version = '0.2.1',
+    version = '0.2.2',
     author = 'Rene Milk',
     author_email = 'rene.milk@uni-muenster.de',
     package_dir = {'':'src'},

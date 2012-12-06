@@ -1,7 +1,7 @@
 import smtplib
 from email.mime.text import MIMEText
 
-def notify(header, body, cfg):
+def notify(header, body, cfg, link):
     if int(cfg['mail.ssl']) == 1:
         smtp = smtplib.SMTP_SSL
     else:

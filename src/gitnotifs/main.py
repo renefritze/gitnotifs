@@ -69,7 +69,7 @@ def format_message(module, diffs, commits, old_rev, new_rev, rev_name, cfg):
     except config.NoOptionError as f:
         body_tpl = jinja2.Template(cfg['general.body'])
     
-    return header_tpl.render(locals()), body_tpl.render(locals())
+    return header_tpl.render(locals()), body_tpl.render(locals()), link
 
 def notify(old_rev, new_rev, rev_name, config_file=None):
     cfg = config.Config()
@@ -81,6 +81,6 @@ def notify(old_rev, new_rev, rev_name, config_file=None):
         logging.info('module: %s' % pname)
         __import__(pname)
         module  = sys.modules[pname]
-        header, body = format_message(transport, diffs, commits, old_rev, new_rev, rev_name, cfg)
-        module.notify(header, body, cfg)
+        header, body, link = format_message(transport, diffs, commits, old_rev, new_rev, rev_name, cfg)
+        module.notify(header, body, cfg, link)
         

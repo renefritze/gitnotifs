@@ -3,7 +3,7 @@ import time
 import _common_xmpp
 
 
-def notify(header, body, cfg):
+def notify(header, body, cfg, link):
     to_jids=cfg['jabber.recipients'].split('\n')
     cl = _common_xmpp.get_client('jabber', header, body, cfg)
     for jid in to_jids:

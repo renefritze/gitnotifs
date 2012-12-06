@@ -3,7 +3,7 @@ import time
 import _common_xmpp
 
 
-def notify(header, body, cfg):
+def notify(header, body, cfg, link):
     to_names=[n.strip() for n in cfg['facebook.recipients'].split('\n')]
     print to_names
     cl = _common_xmpp.get_client('facebook', header, body, cfg)
